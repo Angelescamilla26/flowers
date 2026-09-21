@@ -116,26 +116,82 @@ dialog h2 { font: normal 33px/1.2 Georgia, serif; letter-spacing: -.5px; margin:
 @media (min-width: 1600px) { .hero-copy { padding-top: 65px; } .garden-shell { min-height: 960px; } .garden-art { height: 760px; } .hero-description { font-size: 14px; } .bloom-button { font-size: 13px; padding: 16px 22px; } }
 @media (max-width: 1180px) { .filter-intro { display: none; } .garden-toolbar { padding: 16px; } .flower-filters { flex: 1; justify-content: center; } .scene-note { bottom: 217px; } .footer-message { display: none !important; } .main-nav { gap: 25px; } .garden-art { min-height: 565px; } }
 .botanical-flower[data-center="true"] .bloom-sway { translate: 0 var(--center-offset, 0px); }
-@media (max-width: 760px) {
-  .garden-shell { min-height: 860px; height: max(100svh, 860px); }
-  .site-header { height: 80px; margin: 0 6%; gap: 10px; }
-  .brand { font-size: 28px; gap: 8px; } .brand-mark { width: 28px; height: 28px; }
-  .main-nav { left: auto; right: 55px; transform: none; } .main-nav > a { display: none; } .nav-link { font-size: 10px; } .nav-dot { display: none; }
-  .sound-button { padding: 10px; } .sound-button > span { display: none; }
-  .hero-copy { padding-top: 55px; } .eyebrow { font-size: 8px; letter-spacing: 2.2px; gap: 8px; }
-  h1 { font-size: clamp(43px, 8.4vw, 58px); letter-spacing: -1.8px; }
-  .hero-description { font-size: 12px; margin: 19px 0 22px; } .hero-footnote { font-size: 9px; }
-  .moon { right: 8%; top: 103px; width: 31px; height: 31px; } .moon::after { width: 29px; height: 29px; top: -5px; right: -4px; } .moon-orbit { display: none; }
-  .garden-art { width: 100%; height: 490px; min-height: 0; bottom: 135px; }
+/* Keep the mobile garden in the document flow so flowers and controls never overlap. */
+@media (max-width: 760px), (max-width: 1000px) and (max-height: 500px) and (orientation: landscape) {
+  .garden-shell { min-height: 100svh; height: auto; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .site-header { height: 72px; margin: 0 max(18px, env(safe-area-inset-right, 0px)) 0 max(18px, env(safe-area-inset-left, 0px)); gap: 8px; }
+  .brand { min-height: 44px; font-size: 28px; gap: 8px; white-space: nowrap; }
+  .brand-mark { width: 28px; height: 28px; }
+  .main-nav { position: static; margin-left: auto; transform: none; gap: 0; }
+  .main-nav > a { display: none; }
+  .nav-link { min-height: 44px; padding: 12px 6px; font-size: 11px; }
+  .nav-dot { display: none; }
+  .sound-button { min-width: 44px; min-height: 44px; padding: 12px; justify-content: center; flex-shrink: 0; }
+  .sound-button .icon { width: 18px; height: 18px; }
+  .sound-button > span { display: none; }
+  .sound-button[aria-busy="true"] { opacity: .6; }
+  #garden { min-width: 0; display: grid; grid-template-rows: auto 1fr auto; }
+  .hero-copy { padding: 30px 16px 0; }
+  .eyebrow { margin-bottom: 19px; font-size: 8px; line-height: 1.5; letter-spacing: 1.7px; gap: 8px; }
+  .eyebrow > span { width: 15px; flex-shrink: 0; }
+  h1 { font-size: clamp(32px, 9.5vw, 54px); line-height: 1.13; letter-spacing: -1.1px; }
+  .hero-description { font-size: 13px; line-height: 1.75; margin: 17px 0 20px; letter-spacing: 0; }
+  .bloom-button { min-height: 48px; padding: 13px 18px; font-size: 12px; }
+  .hero-footnote { margin-top: 12px; font-size: 10px; line-height: 1.5; letter-spacing: .15px; }
+  .moon { right: max(24px, env(safe-area-inset-right, 0px)); top: 92px; width: 26px; height: 26px; opacity: .8; }
+  .moon::after { width: 24px; height: 24px; top: -4px; right: -4px; }
+  .moon-orbit { display: none; }
+  .garden-art { position: relative; align-self: end; width: 100%; height: clamp(265px, 78vw, 390px); min-height: 0; bottom: auto; margin-top: -65px; overflow: hidden; }
+  .fireflies { inset: 32% 0 190px; }
   .scene-note, .scene-caption { display: none; }
-  .garden-toolbar { bottom: 74px; left: 5%; right: 5%; min-height: 143px; padding: 13px 12px; flex-wrap: wrap; justify-content: center; gap: 10px; border-radius: 13px; }
-  .flower-filters { flex: 0 0 100%; display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px; }
-  .filter-button { padding: 8px 2px; flex-direction: column; gap: 5px; font-size: 9.5px; min-width: 0; } .filter-icon { width: 23px; height: 23px; }
-  .view-controls { padding-left: 0; border-left: 0; gap: 12px; } .view-controls .icon-button { height: 44px; width: 44px; }
-  .filter-label-long { display: none; } .filter-label-short { display: inline; }
-  .site-footer { height: 57px; justify-content: center; margin: 0 6%; font-size: 8px; } .night-label { display: none !important; }
-  .toast { bottom: 225px; width: max-content; font-size: 10px; padding: 11px 17px; }
-  dialog { padding: 35px 25px 25px; } dialog h2 { font-size: 28px; }
+  .garden-toolbar { position: relative; left: auto; right: auto; bottom: auto; min-height: 0; margin: 0 max(14px, env(safe-area-inset-right, 0px)) 0 max(14px, env(safe-area-inset-left, 0px)); padding: 10px 8px; display: flex; flex-wrap: wrap; justify-content: center; gap: 9px; border-radius: 14px; background: #13291ef2; backdrop-filter: none; scroll-margin-block: 16px; }
+  .flower-filters { flex: 0 0 100%; width: 100%; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 2px; }
+  .filter-button { min-height: 61px; min-width: 0; padding: 7px 1px; flex-direction: column; gap: 4px; font-size: 11px; }
+  .filter-icon { width: 25px; height: 25px; }
+  .filter-label-long { display: none; }
+  .filter-label-short { display: inline; }
+  .view-controls { padding-left: 0; border-left: 0; gap: 12px; }
+  .icon-button { height: 44px; width: 44px; }
+  .site-footer { height: auto; min-height: 77px; padding: 16px 0 18px; margin: 0 max(18px, env(safe-area-inset-right, 0px)) 0 max(18px, env(safe-area-inset-left, 0px)); flex-wrap: wrap; align-content: center; justify-content: center; gap: 7px 18px; font-size: 10px; line-height: 1.5; text-align: center; }
+  .site-footer > span { justify-content: center; }
+  .site-footer .footer-message { display: inline-flex !important; width: 100%; font-size: 12px; }
+  .night-label { display: none !important; }
+  .toast { bottom: calc(16px + env(safe-area-inset-bottom, 0px)); width: max-content; font-size: 12px; line-height: 1.5; padding: 11px 17px; }
+  dialog { padding: 48px 22px 25px; width: calc(100% - 28px); max-height: calc(100svh - 28px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)); overscroll-behavior: contain; }
+  dialog h2 { font-size: 28px; }
+  .dialog-close { top: 10px; right: 10px; }
+  .inhabitant-list article { gap: 13px; }
+  .inhabitant-list p { font-size: 12px; }
+  .dialog-bottom { font-size: 12px; line-height: 1.5; }
 }
-@media (max-width: 360px) { .main-nav { right: 47px; } .nav-link { font-size: 9px; } .brand { font-size: 25px; } .brand-mark { width: 24px; } h1 { font-size: 40px; } .hero-copy { padding-left: 10px; padding-right: 10px; } .eyebrow { letter-spacing: 1.7px; } }
+@media (max-width: 360px) {
+  .site-header { height: 66px; margin-left: max(14px, env(safe-area-inset-left, 0px)); margin-right: max(14px, env(safe-area-inset-right, 0px)); gap: 4px; }
+  .brand { font-size: 25px; gap: 6px; }
+  .brand-mark { width: 25px; height: 25px; }
+  .nav-link { font-size: 10px; padding-inline: 5px; }
+  .hero-copy { padding-top: 26px; padding-inline: 12px; }
+  .eyebrow { font-size: 7.5px; letter-spacing: 1.35px; gap: 6px; }
+  .eyebrow > span { width: 12px; }
+  .hero-description { font-size: 12px; }
+  .filter-button { font-size: 10px; }
+  .garden-toolbar { margin-inline: max(12px, env(safe-area-inset-left, 0px)); padding-inline: 6px; }
+  .moon { top: 84px; width: 23px; height: 23px; }
+  .moon::after { width: 22px; height: 22px; }
+}
+@media (min-width: 600px) and (max-width: 760px), (min-width: 600px) and (max-width: 1000px) and (max-height: 500px) and (orientation: landscape) {
+  .garden-toolbar { flex-wrap: nowrap; padding: 10px 12px; gap: 14px; }
+  .flower-filters { flex: 1 1 auto; width: auto; }
+  .view-controls { padding-left: 12px; border-left: 1px solid #c8d0a322; gap: 8px; }
+  .site-footer .footer-message { width: auto; }
+}
+@media (max-width: 1000px) and (max-height: 500px) and (orientation: landscape) {
+  .site-header { height: 62px; }
+  .hero-copy { padding-top: 22px; }
+  h1 { font-size: 42px; }
+  .eyebrow { margin-bottom: 13px; }
+  .hero-description { margin: 13px 0 16px; }
+  .garden-art { height: 340px; margin-top: -65px; }
+  .moon { top: 94px; right: 12%; }
+  .site-footer { min-height: 61px; }
+}
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } .star { opacity: var(--opacity); } .fireflies .firefly { opacity: .5; } .bloom-spark, .shooting-star { display: none; } }

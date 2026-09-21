@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 
 // A dependency-free preview server. Run with: node dev-server.cjs
 const http = require('node:http');
@@ -19,7 +19,8 @@ const types = {
   '.webp': 'image/webp',
   '.ico': 'image/x-icon',
   '.woff': 'font/woff',
-  '.woff2': 'font/woff2'
+  '.woff2': 'font/woff2',
+  '.mp3': 'audio/mpeg'
 };
 
 function insideRoot(filename) {
@@ -35,6 +36,23 @@ function respond(res, status, message) {
     'X-Content-Type-Options': 'nosniff'
   });
   res.end(message);
+}
+
+function parseByteRange(value, size) {
+  const match = /^bytes=(\d*)-(\d*)$/i.exec(value.trim());
+  if (!match || (!match[1] && !match[2]) || size === 0) return null;
+
+  if (!match[1]) {
+    const suffixLength = Number(match[2]);
+    if (!Number.isSafeInteger(suffixLength) || suffixLength <= 0) return null;
+    return { start: Math.max(0, size - suffixLength), end: size - 1 };
+  }
+
+  const start = Number(match[1]);
+  const requestedEnd = match[2] ? Number(match[2]) : size - 1;
+  if (!Number.isSafeInteger(start) || !Number.isSafeInteger(requestedEnd) ||
+      start >= size || requestedEnd < start) return null;
+  return { start, end: Math.min(requestedEnd, size - 1) };
 }
 
 const server = http.createServer(async (req, res) => {
@@ -73,17 +91,38 @@ const server = http.createServer(async (req, res) => {
       respond(res, 404, 'Not found');
       return;
     }
-    res.writeHead(200, {
+
+    const headers = {
       'Content-Type': contentType,
       'Content-Length': stat.size,
       'Cache-Control': 'no-store',
       'X-Content-Type-Options': 'nosniff'
-    });
+    };
+    let byteRange;
+    if (contentType === 'audio/mpeg') {
+      headers['Accept-Ranges'] = 'bytes';
+      if (req.headers.range !== undefined) {
+        byteRange = parseByteRange(req.headers.range, stat.size);
+        if (!byteRange) {
+          res.writeHead(416, {
+            ...headers,
+            'Content-Length': 0,
+            'Content-Range': `bytes */${stat.size}`
+          });
+          res.end();
+          return;
+        }
+        headers['Content-Range'] = `bytes ${byteRange.start}-${byteRange.end}/${stat.size}`;
+        headers['Content-Length'] = byteRange.end - byteRange.start + 1;
+      }
+    }
+
+    res.writeHead(byteRange ? 206 : 200, headers);
     if (req.method === 'HEAD') {
       res.end();
       return;
     }
-    pipeline(fs.createReadStream(realFilename), res, error => {
+    pipeline(fs.createReadStream(realFilename, byteRange || undefined), res, error => {
       if (error && !res.destroyed) res.destroy(error);
     });
   } catch (error) {

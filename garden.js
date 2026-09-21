@@ -147,77 +147,79 @@
     fullscreenButton.setAttribute('title', label);
   });
 
-  // Offline ambience, created only after the visitor enables sound.
+  // The local song starts from a user gesture, including on mobile browsers.
   const soundButton = document.getElementById('sound-toggle');
-  let audioContext, ambienceGain, chirpTimer;
-  let soundEnabled = false;
-  let soundBusy = false;
-  function createAmbience() {
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContext) throw new Error('Audio no compatible');
-    audioContext = new AudioContext();
-    ambienceGain = audioContext.createGain();
-    ambienceGain.gain.value = .14;
-    ambienceGain.connect(audioContext.destination);
-    const buffer = audioContext.createBuffer(1, audioContext.sampleRate * 4, audioContext.sampleRate);
-    const samples = buffer.getChannelData(0);
-    let previous = 0;
-    for (let i = 0; i < samples.length; i++) { previous = (previous + (Math.random() * 2 - 1) * .025) / 1.025; samples[i] = previous * 2; }
-    const breeze = audioContext.createBufferSource();
-    breeze.buffer = buffer;
-    breeze.loop = true;
-    const filter = audioContext.createBiquadFilter();
-    filter.type = 'lowpass';
-    filter.frequency.value = 650;
-    breeze.connect(filter);
-    filter.connect(ambienceGain);
-    breeze.start();
+  const song = document.getElementById('garden-song');
+  let wantsSound = false;
+  let playRequest = 0;
+  song.volume = .65;
+
+  function updateSoundState() {
+    const playing = !song.paused && !song.ended;
+    soundButton.setAttribute('aria-pressed', String(playing));
+    const label = playing ? 'Desactivar sonidos del jardín' : 'Activar sonidos del jardín';
+    soundButton.setAttribute('title', label);
+    soundButton.setAttribute('aria-label', label);
+    soundButton.querySelector('use').setAttribute('href', playing ? '#i-sound' : '#i-muted');
+    document.getElementById('sound-label').textContent = playing ? 'activado' : 'desactivado';
+    if ('mediaSession' in navigator) navigator.mediaSession.playbackState = playing ? 'playing' : 'paused';
   }
-  function chirp() {
-    if (!soundEnabled || document.hidden || !audioContext) return;
-    const time = audioContext.currentTime;
-    for (let i = 0; i < 3; i++) {
-      const oscillator = audioContext.createOscillator();
-      const gain = audioContext.createGain();
-      const start = time + i * .14;
-      oscillator.frequency.setValueAtTime(2600 + Math.random() * 600, start);
-      oscillator.frequency.exponentialRampToValueAtTime(2100, start + .09);
-      gain.gain.setValueAtTime(0, start);
-      gain.gain.linearRampToValueAtTime(.07, start + .01);
-      gain.gain.exponentialRampToValueAtTime(.001, start + .1);
-      oscillator.connect(gain);
-      gain.connect(ambienceGain);
-      oscillator.start(start);
-      oscillator.stop(start + .12);
-      oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); };
+
+  async function playSong(shouldAnnounce = false) {
+    const request = ++playRequest;
+    wantsSound = true;
+    soundButton.setAttribute('aria-busy', 'true');
+    try {
+      if (song.error) song.load();
+      await song.play();
+      if (request !== playRequest) return;
+      updateSoundState();
+      if (shouldAnnounce) announce('Cierra los ojos un instante. El jardín suena para ti.');
+    } catch {
+      if (request !== playRequest) return;
+      wantsSound = false;
+      updateSoundState();
+      announce('El sonido no está disponible en este navegador.');
+    } finally {
+      if (request === playRequest) soundButton.removeAttribute('aria-busy');
     }
-    chirpTimer = setTimeout(chirp, 2600 + Math.random() * 3600);
   }
-  soundButton.addEventListener('click', async () => {
-    if (soundBusy) return;
-    soundBusy = true;
-    soundButton.disabled = true;
-    try {
-      if (!audioContext) createAmbience();
-      if (soundEnabled) { await audioContext.suspend(); clearTimeout(chirpTimer); soundEnabled = false; }
-      else { await audioContext.resume(); soundEnabled = true; chirp(); }
-      soundButton.setAttribute('aria-pressed', String(soundEnabled));
-      const label = soundEnabled ? 'Desactivar sonidos del jardín' : 'Activar sonidos del jardín';
-      soundButton.setAttribute('title', label);
-      soundButton.setAttribute('aria-label', label);
-      soundButton.querySelector('use').setAttribute('href', soundEnabled ? '#i-sound' : '#i-muted');
-      document.getElementById('sound-label').textContent = soundEnabled ? 'activado' : 'desactivado';
-      announce(soundEnabled ? 'Cierra los ojos un instante. El jardín suena para ti.' : 'El jardín vuelve al silencio.');
-    } catch { announce('El sonido no está disponible en este navegador.'); }
-    finally { soundBusy = false; soundButton.disabled = false; }
+
+  function pauseSong(shouldAnnounce = false) {
+    ++playRequest;
+    wantsSound = false;
+    song.pause();
+    soundButton.removeAttribute('aria-busy');
+    updateSoundState();
+    if (shouldAnnounce) announce('El jardín vuelve al silencio.');
+  }
+
+  soundButton.addEventListener('click', () => {
+    if (wantsSound || !song.paused) pauseSong(true);
+    else playSong(true);
   });
-  document.addEventListener('visibilitychange', async () => {
-    updateMotion();
-    if (!soundEnabled || !audioContext) return;
-    clearTimeout(chirpTimer);
-    try {
-      if (document.hidden) await audioContext.suspend();
-      else { await audioContext.resume(); chirp(); }
-    } catch { /* Browsers may require a new sound-button click to resume audio. */ }
+  song.addEventListener('playing', updateSoundState);
+  song.addEventListener('pause', () => {
+    wantsSound = false;
+    updateSoundState();
   });
+  song.addEventListener('error', () => {
+    const wasRequested = wantsSound;
+    pauseSong();
+    if (wasRequested) announce('El sonido no está disponible en este navegador.');
+  });
+  song.addEventListener('ended', () => { wantsSound = false; updateSoundState(); });
+
+  if ('mediaSession' in navigator) {
+    if ('MediaMetadata' in window) {
+      navigator.mediaSession.metadata = new MediaMetadata({ title: 'Flores Amarillas', artist: 'Floricienta' });
+    }
+    try {
+      navigator.mediaSession.setActionHandler('play', () => playSong());
+      navigator.mediaSession.setActionHandler('pause', () => pauseSong());
+      navigator.mediaSession.setActionHandler('stop', () => { pauseSong(); song.currentTime = 0; });
+    } catch { /* The sound button also works without system media controls. */ }
+  }
+  document.addEventListener('visibilitychange', updateMotion);
+  window.addEventListener('pagehide', () => pauseSong());
 })();

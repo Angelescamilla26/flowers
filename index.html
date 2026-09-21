@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#081d18">
   <meta name="description" content="Un pequeño jardín de flores amarillas, lleno de vida y de luz. Detente un momento, respira y déjalo florecer.">
   <title>Amarillo — Un jardín para ti</title>
@@ -29,17 +29,17 @@
   <div class="garden-shell" id="garden-shell">
     <div class="night-sky" aria-hidden="true"><div class="sky-grain"></div><div id="stars"></div><div class="moon"></div><div class="moon-orbit"></div><span class="shooting-star"></span></div>
     <header class="site-header">
-      <a class="brand" href="./" aria-label="Amarillo, inicio"><svg class="brand-mark" aria-hidden="true"><use href="#i-flower"/></svg><span>amarillo<span class="brand-period">.</span></span></a>
+      <a class="brand" href="./" aria-label="Amarillo, inicio"><svg class="brand-mark" aria-hidden="true"><use href="#i-flower"/></svg><span>Para ti.<span class="brand-period">.</span></span></a>
       <nav class="main-nav" aria-label="Navegación principal"><a class="nav-link active" href="#garden" aria-current="page">El jardín</a><button class="nav-link" type="button" data-open-dialog="inhabitants">Sus habitantes <span class="nav-dot"></span></button></nav>
-      <button class="sound-button" id="sound-toggle" type="button" aria-pressed="false" aria-label="Activar sonidos del jardín" title="Activar sonidos del jardín"><svg class="icon" aria-hidden="true"><use href="#i-muted"/></svg><span>Sonido <span id="sound-label">desactivado</span></span></button>
+      <button class="sound-button" id="sound-toggle" aria-controls="garden-song" type="button" aria-pressed="false" aria-label="Activar sonidos del jardín" title="Activar sonidos del jardín"><svg class="icon" aria-hidden="true"><use href="#i-muted"/></svg><span>Sonido <span id="sound-label">desactivado</span></span></button>
     </header>
     <main id="garden">
       <section class="hero-copy" aria-labelledby="hero-title">
-        <p class="eyebrow"><span></span> UN PEQUEÑO RINCÓN PARA TI <span></span></p>
-        <h1 id="hero-title">Un poquito de sol,<br><em>incluso de noche.</em></h1>
-        <p class="hero-description">Hay detalles que florecen solo para hacerte sonreír.<br>Este jardín amarillo es uno de ellos.</p>
+        <p class="eyebrow"><span></span> NOMAS POR QUE SI <span></span></p>
+        <h1 id="hero-title">Un pequeño detalle,<br><em>nomas por bonita.</em></h1>
+        <p class="hero-description">Para que no te toque ser espectadora,<br>ten unas flores virtuales echas con cariño.</p>
         <button class="bloom-button" id="bloom-button" type="button"><svg class="icon" aria-hidden="true"><use href="#i-sprout"/></svg><span>Haz florecer el jardín</span><svg class="icon arrow" aria-hidden="true"><use href="#i-arrow"/></svg></button>
-        <span class="hero-footnote">Un respiro. Un instante. Un poco de magia.</span>
+        <span class="hero-footnote"></span>
       </section>
       <div class="garden-art" id="garden-art"><svg id="botanical-scene" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Un jardín nocturno de flores amarillas con hierbas, mariposas, abejas, un conejo y un caracol."></svg></div>
       <div class="fireflies" id="fireflies" aria-hidden="true"></div><div class="bloom-sparkles" id="bloom-sparkles" aria-hidden="true"></div>
@@ -60,7 +60,7 @@
         </div>
       </section>
     </main>
-    <footer class="site-footer"><span>Hecho con <svg class="footer-heart" aria-label="amor" role="img"><use href="#i-heart"/></svg> y un poquito de naturaleza.</span><span class="footer-message">Las cosas bonitas también crecen despacio.</span><span class="night-label"><svg class="icon" aria-hidden="true"><use href="#i-moon"/></svg> Bajo la misma luna</span></footer>
+    <footer class="site-footer"><span>Hecho con <svg class="footer-heart" aria-label="amor" role="img"><use href="#i-heart"/></svg> especialmente para ti.</span><span class="footer-message">Las cosas bonitas también crecen despacio.</span><span class="night-label"><svg class="icon" aria-hidden="true"><use href="#i-moon"/></svg> Bajo la misma luna</span></footer>
     <p id="status" class="toast" role="status" aria-live="polite"></p>
   </div>
   <dialog id="inhabitants" aria-labelledby="inhabitants-title">
@@ -76,5 +76,6 @@
     <div class="dialog-bottom"><span class="tiny-spark">✧</span> Y luciérnagas para encender la noche.</div>
   </dialog>
   <noscript><p class="noscript-message">Activa JavaScript para descubrir las flores y los habitantes de este jardín.</p></noscript>
+  <audio id="garden-song" src="Floricienta%20%E2%80%94%20Flores%20Amarillas%20%5BLetra%5D.mp3" preload="none" loop playsinline hidden></audio>
 </body>
 </html>
